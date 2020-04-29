@@ -2,7 +2,7 @@ const connection = require('../database/connection')
 
 module.exports = {
     async store(req, res) {
-        const { CPF, nameClient, birthDate, email, password } = req.body
+        const { CPF, clientName, birthDate, email, password } = req.body
 
         let response = await connection('clients').where("CPF", CPF)
 
@@ -12,13 +12,13 @@ module.exports = {
         else {
             response = await connection('clients').insert({
                 CPF,
-                nameClient,
+                clientName,
                 birthDate,
                 email,
                 password
 
             })
-            return res.json( response)
+            return res.json(response)
         }
 
     },
@@ -67,7 +67,7 @@ module.exports = {
 
     async update(req, res) {
 
-        const { CPF, nameClient, birthDate, email, password } = req.body
+        const { CPF, clientName, birthDate, email, password } = req.body
 
         const response = await connection('clients').where("CPF", CPF)
 
@@ -76,7 +76,7 @@ module.exports = {
         }
         else{
             await connection('clients').where("CPF", CPF)
-            .update("nameClient", nameClient)
+            .update("clientName", clientName)
             .update("birthDate", birthDate)
             .update("email", email)
             .update("password", password)

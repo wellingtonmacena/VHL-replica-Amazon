@@ -2,7 +2,7 @@
 exports.up = function(knex) {
   return knex.schema.createTable('clients', function (table){
       table.integer('CPF').notNullable().primary()
-      table.string('nameClient').notNullable()
+      table.string('clientName').notNullable()
       table.string('birthDate').notNullable()
       table.string('email').notNullable()
       table.string('password').notNullable()

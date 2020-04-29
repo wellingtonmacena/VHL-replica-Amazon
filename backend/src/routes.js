@@ -41,6 +41,7 @@ routes.put("/products", ControllerProducts.update)
 
 routes.post("/sales", ControllerSales.store)
 routes.get("/sales", ControllerSales.index)
+routes.get("/salesShow", ControllerSales.show)
 
 
 module.exports = routes

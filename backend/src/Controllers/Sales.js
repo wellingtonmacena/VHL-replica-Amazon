@@ -3,7 +3,8 @@ const getDate = require('../utils/getDate')
 module.exports = {
 
     async store(req, res) {
-        const { quantityProducts,
+        const {
+            quantityProducts,
             fkClientCPF,
             itemCode,
             CNPJ } = req.body
@@ -39,13 +40,16 @@ module.exports = {
         numberCard = Object.values(numberCard[0])[0]
 
 
-        let totalPrice = await connection('products')
+        let price = await connection('products')
             .where(
                 { itemCode }
             )
             .select("price")
-        totalPrice = Object.values(totalPrice[0])[0]
-        totalPrice = Number(totalPrice) * quantityProducts
+
+        price = Object.values(price[0])[0]
+
+
+        let totalPrice = Number(price) * quantityProducts
 
 
         let nameProduct = await connection('products')
@@ -53,7 +57,7 @@ module.exports = {
                 { itemCode }
             )
             .select(" nameProduct")
-         nameProduct = Object.values(nameProduct[0])[0]
+        nameProduct = Object.values(nameProduct[0])[0]
 
 
         let nameBrand = await connection('brands')
@@ -63,48 +67,73 @@ module.exports = {
             .select(" nameBrand")
         nameBrand = Object.values(nameBrand[0])[0]
 
+        let CPF = fkClientCPF
+        let clientName = await connection('clients')
+            .where({
+                CPF
+            })
+            .select("clientName")
+        clientName = Object.values(clientName[0])[0]
 
         let date = getDate()
         //-----------//
 
-        let fkItemCode = itemCode
-        let fkBrandCNPJ = CNPJ
+        fkItemCode = itemCode
+        fkBrandCNPJ = CNPJ
 
-         let response = await connection('sales')
-             .where({
-                 fkClientCPF,
-                 fkItemCode,
-                 quantityProducts,
-                 date
-             })
-             
-         if (response.length == 0) {
-             response = await connection('sales').insert({
-                 quantityProducts,
-                 phoneClient,
-                 numberCard,
-                 fkClientCPF,
-                 fkItemCode,
-                 fkBrandCNPJ,
-                 date,
-                 totalPrice,
-                 CEP,
-                 allowedPeople,
-                 nameProduct,
-                 nameBrand,
-                 numberCard
+        let response = await connection('sales')
+            .where({
+                fkClientCPF,
+                fkItemCode,
+                quantityProducts,
+                date
+            })
 
-             })}
-             else {
-                 return res.json()
-             }
+        if (response.length == 0) {
+            response = await connection('sales').insert({
+                quantityProducts,
+                phoneClient,
+                numberCard,
+                fkClientCPF,
+                fkItemCode,
+                fkBrandCNPJ,
+                date,
+                totalPrice,
+                CEP,
+                allowedPeople,
+                nameProduct,
+                nameBrand,
+                numberCard,
+                clientName,
+                price
+            })
+            return res.json(response)
 
-         },
+        }
+        else {
+            return res.json()
+        }
 
-         async index(req, res){
+    },
 
-            const response = await connection('sales').select('*')
-            return res.send(response)
-         }
+    async index(req, res) {
+        const { CPF } = req.body
+        const response = await connection('sales')
+            .where("fkClientCPF", CPF)
+            .select('*')
+        return res.send(response)
+    },
+
+    async show(req, res) {
+        const { CPF, id } = req.body
+
+        const response = await connection('sales')
+            .where("fkClientCPF", CPF)
+            .where({ id })
+            .select("*")
+
+        return res.json(response)
 
     }
+
+}
